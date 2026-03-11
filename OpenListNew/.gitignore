@@ -1,0 +1,11 @@
+# Data directories (configurations for all services)
+/data/
+
+# Download directories (downloaded files)
+/downloads/
+
+# Temporary directories (cache files)
+/temp/
+
+# Transmission watch directory
+/watch/

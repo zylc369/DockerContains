@@ -1,0 +1,5 @@
+# Gitea Data Directory (contains repos, config, logs, etc.)
+/gitea/
+
+# PostgreSQL Data Directory (contains database files)
+/postgres/

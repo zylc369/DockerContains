@@ -1,0 +1,109 @@
+# docker-compose.yml
+services:
+  # OpenList | OpenList Core Service
+  openlist:
+    image: 'openlistteam/openlist:latest'
+    container_name: openlist-new
+    volumes:
+      - '${OPLISTDX_DATA}/openlist:/opt/openlist/data'
+      - '${OPLISTDX_TEMP}/aria2:/opt/openlist/data/temp/aria2'
+      - '${OPLISTDX_TEMP}/qBittorrent:/opt/openlist/data/temp/qBittorrent'
+      - '${OPLISTDX_TEMP}/Transmission:/opt/openlist/data/temp/Transmission'
+      - '/Volumes/ExtHD/HomeCloud:/opt/openlist/data/HomeCloud'
+    user: '${OPLISTDX_PUID}:${OPLISTDX_PGID}' # If you are using v4.1.0 later, must uncomment this line and set the correct user ID and group ID.
+    ports:
+      - '5244:5244'
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      # - PUID=${OPLISTDX_PUID} # Deprecated in v4.1.0 later versions
+      # - PGID=${OPLISTDX_PGID} # Deprecated in v4.1.0 later versions
+      - TZ=${OPLISTDX_TZ}
+      - UMASK=022
+    restart: unless-stopped
+
+  # Aria2 下载器及webui | Aria2 Downloader & WebUI
+  aria2-pro:
+    image: p3terx/aria2-pro
+    container_name: aria2-pro-new
+    restart: unless-stopped
+    ports:
+      - '6800:6800'
+      - '6888:6888'
+      - '6888:6888/udp'
+    volumes:
+      - '${OPLISTDX_DATA}/aria2-pro:/config'
+      - '${OPLISTDX_DOWNLOADS}/aria2:/downloads'
+      - '${OPLISTDX_TEMP}/aria2:/opt/openlist/data/temp/aria2'
+    environment:
+      - 'PUID=${OPLISTDX_PUID}'
+      - 'PGID=${OPLISTDX_PGID}'
+      - 'TZ=${OPLISTDX_TZ}'
+      - 'UMASK_SET=022'
+      - 'RPC_SECRET=${OPLISTDX_ARIA2TOKEN}'
+      - 'RPC_PORT=6800'
+      - 'LISTEN_PORT=6888'
+  ariang:
+    container_name: ariang-new
+    image: p3terx/ariang
+    command: --port 6880
+    ports:
+      - 6880:6880
+    restart: unless-stopped
+    environment:
+      - 'PUID=${OPLISTDX_PUID}'
+      - 'PGID=${OPLISTDX_PGID}'
+      - 'TZ=${OPLISTDX_TZ}'
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+    depends_on:
+      - aria2-pro
+
+  # qBittorrent 下载器 | qBittorrent Downloader
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent-new
+    environment:
+      - PUID=${OPLISTDX_PUID}
+      - PGID=${OPLISTDX_PGID}
+      - TZ=${OPLISTDX_TZ}
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - '${OPLISTDX_DATA}/qbittorrent:/config'
+      - '${OPLISTDX_DOWNLOADS}/qbittorrent:/downloads'
+      - '${OPLISTDX_TEMP}/qBittorrent:/opt/openlist/data/temp/qBittorrent'
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+
+  # Transmission 下载器 | Transmission Downloader
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission-new
+    environment:
+      - PUID=${OPLISTDX_PUID}
+      - PGID=${OPLISTDX_PGID}
+      - TZ=${OPLISTDX_TZ}
+      - TRANSMISSION_WEB_HOME=${OPLISTDX_TRANSMISSION_WEB_HOME} #optional
+      - USER=${OPLISTDX_TRANSMISSION_USER} #optional
+      - PASS=${OPLISTDX_TRANSMISSION_PASS} #optional
+      - WHITELIST=${OPLISTDX_TRANSMISSION_WHITELIST} #optional
+      - PEERPORT=${OPLISTDX_TRANSMISSION_PEERPORT} #optional
+      - HOST_WHITELIST=${OPLISTDX_TRANSMISSION_HOST_WHITELIST} #optional
+    volumes:
+      - '${OPLISTDX_DATA}/transmission:/config'
+      - '${OPLISTDX_DOWNLOADS}/transmission:/downloads'
+      - '${OPLISTDX_TRANSMISSIONWATCH}:/watch'
+      - '${OPLISTDX_TEMP}/Transmission:/opt/openlist/data/temp/Transmission'
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped

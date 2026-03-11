@@ -1,0 +1,52 @@
+# Sisyphus work directory
+/.sisyphus
+
+/.sisyphus
+
+# Environment files (contain secrets)
+.env
+# Ignore all files in data directory (all depths)
+/data/**
+!/data/.gitkeep
+
+# But preserve directory structure with .gitkeep files
+# Note: Must negate each parent directory before negating files
+!/data/notes
+!/data/notes/.gitkeep
+
+!/data/home
+!/data/home/.cache
+!/data/home/.cache/opencode
+!/data/home/.cache/opencode/.gitkeep
+
+!/data/home/.config
+!/data/home/.config/opencode
+!/data/home/.config/opencode/.gitkeep
+!/data/home/.config/opencode/oh-my-opencode.json
+!/data/home/.config/opencode/oh-my-opencode.json.bak*
+!/data/home/.config/opencode/opencode.json
+!/data/home/.config/opencode/opencode.json.bak*
+
+!/data/home/.local
+!/data/home/.local/share
+!/data/home/.local/share/opencode
+!/data/home/.local/share/opencode/.gitkeep
+
+!/data/home/.local/state
+!/data/home/.local/state/opencode
+!/data/home/.local/state/opencode/.gitkeep
+
+!/data/home/data
+!/data/home/data/ai-doctor-notes
+!/data/home/data/ai-doctor-notes/.gitkeep
+
+!/data/home/Codes
+!/data/home/Codes/.gitkeep
+/data/home/Codes/buwai-ai-extension
+
+# macOS extended attributes
+._*
+.DS_Store
+
+# Backup files
+*~

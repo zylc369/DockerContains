@@ -1,8 +1,8 @@
-# Docker/Container Agent Guide
+# AI Container - OpenCode Development Environment
+**Generated:** 2026-03-12
+**Location:** `./ai-container/`
 
-**Location:** `containers/ai-container/`
-
-**Purpose:** Development environment for AI coding assistant with Ubuntu 22.04, Node.js, Bun, OpenCode, and oh-my-opencode.
+**Purpose:** Containerized AI coding assistant with Ubuntu 22.04, Node.js, Bun, OpenCode, and oh-my-opencode
 
 ---
 
@@ -12,7 +12,7 @@ Containerized development environment running OpenCode web interface (port 4096)
 
 ---
 
-## Where to Look
+## WHERE TO LOOK
 
 **Entry Points:**
 - `start.sh` — Start/restart container, prompts for GITHUB_TOKEN
@@ -33,11 +33,9 @@ Containerized development environment running OpenCode web interface (port 4096)
 - `./data/home/.local/state/opencode` — OpenCode state
 
 ---
-
-## Common Commands
-
+## COMMANDS
 ```bash
-cd containers/ai-container
+cd ai-container
 
 # Start container (prompts for token if needed)
 ./start.sh
@@ -57,7 +55,7 @@ docker exec -it ai-container bash
 
 ---
 
-## Anti-Patterns
+## ANTI-PATTERNS
 
 - DO NOT hardcode GITHUB_TOKEN in Dockerfile or scripts
 - DO NOT run container as root user (aiuser only)

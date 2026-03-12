@@ -27,6 +27,9 @@
 !/data/home/.config/opencode/opencode.json
 !/data/home/.config/opencode/opencode.json.bak*
 
+!/data/home/.config/repos
+!/data/home/.config/repos/repos.json
+!/data/home/.config/repos/repos.json.example
 !/data/home/.local
 !/data/home/.local/share
 !/data/home/.local/share/opencode

@@ -1,0 +1,12 @@
+{
+  "repos": [
+    {
+      "url": "https://github.com/owner/repo-name",
+      "branch": "main",
+      "directory": "/home/aiuser/Codes/repo-name"
+    },
+    {
+      "url": "https://github.com/owner/another-repo"
+    }
+  ]
+}

@@ -124,42 +124,101 @@ if [ -d "$REPO_DIR/.git" ]; then
     fi
 fi
 
-# Clone or pull buwai-claude-assistant repository
-if [ -n "$GITHUB_TOKEN" ]; then
-    REPO_URL_CLAUDE="https://${GITHUB_TOKEN}@github.com/zylc369/buwai-claude-assistant"
-else
-    REPO_URL_CLAUDE="https://github.com/zylc369/buwai-claude-assistant"
-fi
-REPO_DIR_CLAUDE="/home/aiuser/Codes/buwai-claude-assistant"
-BRANCH_CLAUDE="main"
-
-echo ""
-echo "Setting up buwai-claude-assistant repository..."
-
-# Check if it's a valid git repository
-if [ -d "$REPO_DIR_CLAUDE/.git" ] && git -C "$REPO_DIR_CLAUDE" rev-parse --git-dir >/dev/null 2>&1; then
-    echo "Repository exists, updating..."
-    cd "$REPO_DIR_CLAUDE"
+# Function to clone or pull repository from config
+clone_repo_from_config() {
+    local repo_url="$1"
+    local branch="$2"
+    local target_dir="$3"
     
-    # Fetch and pull latest changes
-    echo "Fetching latest changes..."
-    if git fetch origin "$BRANCH_CLAUDE" && git checkout "$BRANCH_CLAUDE" && git pull origin "$BRANCH_CLAUDE"; then
-        echo "Repository updated to latest $BRANCH_CLAUDE branch."
-    else
-        echo "Update failed, attempting to re-clone..."
-        rm -rf "${REPO_DIR_CLAUDE:?}"
-        git clone "$REPO_URL_CLAUDE" "$REPO_DIR_CLAUDE"
+    # Extract repo name from URL if target_dir not specified
+    if [ -z "$target_dir" ]; then
+        local repo_name=$(basename "$repo_url" .git)
+        target_dir="/home/aiuser/Codes/$repo_name"
     fi
-else
-    echo "Cloning repository..."
-    git clone "$REPO_URL_CLAUDE" "$REPO_DIR_CLAUDE"
-    echo "Repository cloned."
-fi
+    
+    # Use main as default branch if not specified
+    if [ -z "$branch" ]; then
+        branch="main"
+    fi
+    
+    echo "Setting up repository: $repo_url (branch: $branch, dir: $target_dir)"
+    
+    # Add token to URL if available
+    local clone_url="$repo_url"
+    if [ -n "$GITHUB_TOKEN" ] && [[ "$repo_url" == *"github.com"* ]]; then
+        clone_url="${repo_url/github.com/${GITHUB_TOKEN}@github.com}"
+    fi
+    
+    # Check if it's a valid git repository
+    if [ -d "$target_dir/.git" ] && git -C "$target_dir" rev-parse --git-dir >/dev/null 2>&1; then
+        echo "Repository exists at $target_dir, updating..."
+        cd "$target_dir"
+        
+        # Fetch all branches and checkout the specified branch
+        echo "Fetching latest changes..."
+        if git fetch origin && git checkout "$branch" 2>/dev/null; then
+            if git pull origin "$branch" 2>/dev/null; then
+                echo "Repository updated to latest $branch branch."
+            else
+                echo "Pull failed, but checkout succeeded. Repository is at $branch branch."
+            fi
+        else
+            # Branch might not exist locally, try to checkout from remote
+            echo "Attempting to checkout $branch from remote..."
+            if git fetch origin "$branch:$branch" 2>/dev/null && git checkout "$branch"; then
+                echo "Checked out $branch branch."
+            else
+                echo "Warning: Could not checkout branch $branch, attempting to re-clone..."
+                rm -rf "${target_dir:?}"
+                git clone -b "$branch" "$clone_url" "$target_dir" && echo "Repository cloned." || echo "Failed to clone repository."
+            fi
+        fi
+    else
+        echo "Cloning repository..."
+        if git clone -b "$branch" "$clone_url" "$target_dir"; then
+            echo "Repository cloned to $target_dir."
+        else
+            echo "Failed to clone repository $repo_url"
+            return 1
+        fi
+    fi
+    
+    # Remove token from remote URL for security
+    if [ -d "$target_dir/.git" ]; then
+        cd "$target_dir"
+        git remote set-url origin "$repo_url"
+    fi
+}
 
-# Remove token from remote URL (credential.helper will handle auth)
-if [ -d "$REPO_DIR_CLAUDE/.git" ]; then
-    cd "$REPO_DIR_CLAUDE"
-    git remote set-url origin "https://github.com/zylc369/buwai-claude-assistant"
+# Clone repositories from config file
+REPOS_CONFIG="/home/aiuser/.config/repos/repos.json"
+if [ -f "$REPOS_CONFIG" ]; then
+    echo ""
+    echo "Reading repositories configuration from $REPOS_CONFIG..."
+    
+    # Use jq to parse JSON and iterate over repos
+    jq -r '.repos[] | "\(.url)|\(.branch // \"\")|\(.directory // \"\")"' "$REPOS_CONFIG" 2>/dev/null | while IFS='|' read -r url branch directory; do
+        if [ -n "$url" ]; then
+            echo ""
+            clone_repo_from_config "$url" "$branch" "$directory"
+        fi
+    done
+    
+    echo ""
+    echo "Repository sync completed."
+else
+    echo ""
+    echo "No repos.json config found at $REPOS_CONFIG"
+    echo "To auto-clone repositories, create the config file with format:"
+    echo '{
+  "repos": [
+    {
+      "url": "https://github.com/owner/repo",
+      "branch": "main",
+      "directory": "/home/aiuser/Codes/repo"
+    }
+  ]
+}'
 fi
 
 # Execute the passed command

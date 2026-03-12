@@ -124,5 +124,43 @@ if [ -d "$REPO_DIR/.git" ]; then
     fi
 fi
 
+# Clone or pull buwai-claude-assistant repository
+if [ -n "$GITHUB_TOKEN" ]; then
+    REPO_URL_CLAUDE="https://${GITHUB_TOKEN}@github.com/zylc369/buwai-claude-assistant"
+else
+    REPO_URL_CLAUDE="https://github.com/zylc369/buwai-claude-assistant"
+fi
+REPO_DIR_CLAUDE="/home/aiuser/Codes/buwai-claude-assistant"
+BRANCH_CLAUDE="main"
+
+echo ""
+echo "Setting up buwai-claude-assistant repository..."
+
+# Check if it's a valid git repository
+if [ -d "$REPO_DIR_CLAUDE/.git" ] && git -C "$REPO_DIR_CLAUDE" rev-parse --git-dir >/dev/null 2>&1; then
+    echo "Repository exists, updating..."
+    cd "$REPO_DIR_CLAUDE"
+    
+    # Fetch and pull latest changes
+    echo "Fetching latest changes..."
+    if git fetch origin "$BRANCH_CLAUDE" && git checkout "$BRANCH_CLAUDE" && git pull origin "$BRANCH_CLAUDE"; then
+        echo "Repository updated to latest $BRANCH_CLAUDE branch."
+    else
+        echo "Update failed, attempting to re-clone..."
+        rm -rf "${REPO_DIR_CLAUDE:?}"
+        git clone "$REPO_URL_CLAUDE" "$REPO_DIR_CLAUDE"
+    fi
+else
+    echo "Cloning repository..."
+    git clone "$REPO_URL_CLAUDE" "$REPO_DIR_CLAUDE"
+    echo "Repository cloned."
+fi
+
+# Remove token from remote URL (credential.helper will handle auth)
+if [ -d "$REPO_DIR_CLAUDE/.git" ]; then
+    cd "$REPO_DIR_CLAUDE"
+    git remote set-url origin "https://github.com/zylc369/buwai-claude-assistant"
+fi
+
 # Execute the passed command
 exec "$@"

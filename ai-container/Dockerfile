@@ -14,6 +14,15 @@ RUN sed -i 's|ports.ubuntu.com|mirrors.aliyun.com|g' /etc/apt/sources.list && \
     sudo \
     unzip \
     vim \
+    software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python 3.14 from Deadsnakes PPA
+RUN add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y \
+    python3.14 \
+    python3.14-venv \
+    python3.14-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js (NodeSource) for serve package

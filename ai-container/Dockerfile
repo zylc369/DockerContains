@@ -14,6 +14,7 @@ RUN sed -i 's|ports.ubuntu.com|mirrors.aliyun.com|g' /etc/apt/sources.list && \
     sudo \
     unzip \
     vim \
+    jq \
     software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 

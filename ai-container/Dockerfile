@@ -68,8 +68,8 @@ RUN printf '#!/bin/sh\nexec ls -ahl "$@"' > /usr/local/bin/ll && chmod +x /usr/l
 RUN chown -R aiuser:aiuser /home/aiuser
 
 # Copy entrypoint script
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
+
 
 # Set PATH environment variable for runtime
 ENV PATH="/home/aiuser/.npm-global/bin:/home/aiuser/.opencode/bin:/home/aiuser/.bun/bin:$PATH"

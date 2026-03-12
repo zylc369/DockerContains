@@ -1,0 +1,11 @@
+# macOS extended attributes
+._*
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS folders
+.DocumentRevisions-V100
+.Trashes
+.Spotlight-V100
+.TemporaryItems

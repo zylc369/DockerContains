@@ -25,6 +25,9 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     python3.14-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Install basedpyright globally
+RUN python3.14 -m pip install --break-system-packages basedpyright==1.26.0
+
 # Install Node.js (NodeSource) for serve package
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
     apt-get install -y nodejs && \

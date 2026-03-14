@@ -52,10 +52,15 @@ container_exists() {
 
 # Parse arguments
 FORCE_RESTART=false
+FORCE_REBUILD=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         -r|--restart)
             FORCE_RESTART=true
+            shift
+            ;;
+        --rebuild)
+            FORCE_REBUILD=true
             shift
             ;;
         -h|--help)
@@ -63,13 +68,14 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  -r, --restart    Restart the container if it's already running"
+            echo "  --rebuild        Stop, rebuild (no-cache), and start the container"
             echo "  -h, --help       Show this help message"
             echo ""
             echo "This script will:"
             echo "  1. Check for .env file and GITHUB_TOKEN"
             echo "  2. Prompt for token if not found"
             echo "  3. Check for auth.json and API key"
-            echo "  4. Start or restart the Docker container"
+            echo "  4. Start, restart, or rebuild the Docker container"
             exit 0
             ;;
         *)
@@ -218,10 +224,20 @@ EOF
     done
 fi
 
-# Step 2: Handle container start/restart
+# Step 2: Handle container start/restart/rebuild
 info_msg "Checking container status..."
 
-if is_container_running; then
+if [ "$FORCE_REBUILD" = true ]; then
+    info_msg "Stopping container..."
+    docker-compose down
+    
+    info_msg "Rebuilding container (no-cache)..."
+    docker-compose build --no-cache
+    
+    info_msg "Starting container..."
+    docker-compose up -d
+    success_msg "Container rebuilt and started successfully"
+elif is_container_running; then
     if [ "$FORCE_RESTART" = true ]; then
         info_msg "Restarting container..."
         docker-compose restart

@@ -155,9 +155,27 @@ update_repository() {
     fi
     
     log_info "Fetching latest changes..."
-    if git fetch origin "$branch" --depth 1 && \
-       git checkout "$branch" && \
-       { [ "$sparse_content" = "-" ] || git sparse-checkout reapply; }; then
+    if git fetch origin "$branch" --depth 1; then
+        # Check if local branch has diverged from remote (e.g., due to force push)
+        local local_commit=$(git rev-parse HEAD 2>/dev/null)
+        local remote_commit=$(git rev-parse "origin/$branch" 2>/dev/null)
+        
+        if [ "$local_commit" != "$remote_commit" ]; then
+            # Check if it's a simple fast-forward or diverged
+            if git merge-base --is-ancestor "$local_commit" "$remote_commit" 2>/dev/null; then
+                # Fast-forward possible
+                log_info "Fast-forwarding to remote..."
+            else
+                # Diverged (likely due to force push on remote)
+                log_warn "Remote branch was force-pushed. Resetting to remote state..."
+            fi
+            git reset --hard "origin/$branch"
+        fi
+        
+        if [ "$sparse_content" != "-" ]; then
+            git sparse-checkout reapply 2>/dev/null || true
+        fi
+        
         log_info "Repository updated to latest $branch branch."
         return 0
     else

@@ -50,6 +50,16 @@ container_exists() {
     docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"
 }
 
+# Function to clean macOS AppleDouble files (causes Docker build failure on external volumes)
+clean_appledouble() {
+    local count=$(find "$SCRIPT_DIR" -name "._*" -type f 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$count" -gt 0 ]; then
+        info_msg "Cleaning $count AppleDouble file(s) (macOS metadata on external volume)..."
+        find "$SCRIPT_DIR" -name "._*" -type f -delete 2>/dev/null
+        success_msg "AppleDouble files cleaned"
+    fi
+}
+
 # Parse arguments
 FORCE_RESTART=false
 FORCE_REBUILD=false
@@ -231,6 +241,8 @@ if [ "$FORCE_REBUILD" = true ]; then
     info_msg "Stopping container..."
     docker-compose down
     
+    clean_appledouble
+    
     info_msg "Rebuilding container (no-cache)..."
     docker-compose build --no-cache
     
@@ -266,6 +278,8 @@ else
     else
         info_msg "Building and starting container..."
     fi
+    
+    clean_appledouble
     
     docker-compose up -d --build
     success_msg "Container started successfully"

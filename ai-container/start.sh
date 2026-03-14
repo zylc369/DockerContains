@@ -80,6 +80,7 @@ fix_data_permissions() {
 # Parse arguments
 FORCE_RESTART=false
 FORCE_REBUILD=false
+FORCE_REBUILD_CACHE=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         -r|--restart)
@@ -90,13 +91,18 @@ while [[ $# -gt 0 ]]; do
             FORCE_REBUILD=true
             shift
             ;;
+        --rebuild-cache)
+            FORCE_REBUILD_CACHE=true
+            shift
+            ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  -r, --restart    Restart the container if it's already running"
-            echo "  --rebuild        Stop, rebuild (no-cache), and start the container"
-            echo "  -h, --help       Show this help message"
+            echo "  -r, --restart      Restart the container if it's already running"
+            echo "  --rebuild          Stop, rebuild (no-cache), and start the container"
+            echo "  --rebuild-cache    Stop, rebuild (with cache), and start the container"
+            echo "  -h, --help         Show this help message"
             echo ""
             echo "This script will:"
             echo "  1. Check for .env file and GITHUB_TOKEN"
@@ -264,6 +270,18 @@ if [ "$FORCE_REBUILD" = true ]; then
     
     info_msg "Rebuilding container (no-cache)..."
     docker-compose build --no-cache
+    
+    info_msg "Starting container..."
+    docker-compose up -d
+    success_msg "Container rebuilt and started successfully"
+elif [ "$FORCE_REBUILD_CACHE" = true ]; then
+    info_msg "Stopping container..."
+    docker-compose down
+    
+    clean_appledouble
+    
+    info_msg "Rebuilding container (with cache)..."
+    docker-compose build
     
     info_msg "Starting container..."
     docker-compose up -d

@@ -1,6 +1,40 @@
 #!/bin/bash
 set -e
 
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
+
+CURRENT_UID=$(id -u aiuser)
+CURRENT_GID=$(id -g aiuser)
+
+if [ "$PUID" != "$CURRENT_UID" ] || [ "$PGID" != "$CURRENT_GID" ]; then
+    echo "Configuring aiuser with UID=$PUID, GID=$PGID..."
+    
+    groupmod -o -g "$PGID" aiuser 2>/dev/null || true
+    usermod -o -u "$PUID" aiuser 2>/dev/null || true
+    
+    chown -R "$PUID:$PGID" /home/aiuser
+    
+    for dir in \
+        /home/aiuser/Codes/ai-doctor/notes \
+        /home/aiuser/Codes/buwai-ai-extension \
+        /home/aiuser/Codes/buwai-claude-assistant \
+        /home/aiuser/.cache/opencode \
+        /home/aiuser/.config/opencode \
+        /home/aiuser/.config/repos \
+        /home/aiuser/.local/share/opencode \
+        /home/aiuser/.local/state/opencode
+    do
+        if [ -d "$dir" ]; then
+            chown -R "$PUID:$PGID" "$dir" 2>/dev/null || true
+        fi
+    done
+    
+    echo "User configuration complete."
+fi
+
+git config --global --add safe.directory '*' 2>/dev/null || true
+
 if [ -n "$GITHUB_TOKEN" ]; then
     echo "Configuring Git to use GitHub Token..."
     git config --global credential.helper store
@@ -12,6 +46,7 @@ if [ -n "$GITHUB_TOKEN" ]; then
     git config --global pack.packSizeLimit 512m
     echo "https://${GITHUB_TOKEN}@github.com" > ~/.git-credentials
     chmod 600 ~/.git-credentials
+    git config --global --add safe.directory '*' 2>/dev/null || true
     echo "Git configured successfully."
 else
     echo "Warning: GITHUB_TOKEN not set. Git operations may fail for private repos."
@@ -21,6 +56,19 @@ else
     git config --global core.compression 0
     git config --global pack.windowMemory 512m
     git config --global pack.packSizeLimit 512m
+fi
+
+mkdir -p /home/aiuser
+git config --global --file /home/aiuser/.gitconfig --add safe.directory '*' 2>/dev/null || true
+chown "$PUID:$PGID" /home/aiuser/.gitconfig 2>/dev/null || true
+if [ -f /root/.gitconfig ]; then
+    cp /root/.gitconfig /home/aiuser/.gitconfig 2>/dev/null || true
+    chown "$PUID:$PGID" /home/aiuser/.gitconfig 2>/dev/null || true
+fi
+if [ -f /root/.git-credentials ]; then
+    cp /root/.git-credentials /home/aiuser/.git-credentials 2>/dev/null || true
+    chown "$PUID:$PGID" /home/aiuser/.git-credentials 2>/dev/null || true
+    chmod 600 /home/aiuser/.git-credentials 2>/dev/null || true
 fi
 
 REPOS_CONFIG="/home/aiuser/.config/repos/repos.json"
@@ -36,20 +84,43 @@ basic_clone() {
         clone_url="${url/github.com/${GITHUB_TOKEN}@github.com}"
     fi
     
-    if [ -d "$directory/.git" ] && git -C "$directory" rev-parse --git-dir >/dev/null 2>&1; then
-        echo "Repository exists, updating..."
-        cd "$directory"
-        if git fetch origin && git checkout "$branch" 2>/dev/null && git pull origin "$branch" 2>/dev/null; then
-            echo "Repository updated."
+    local max_attempts=5
+    local attempt=1
+    local delay=5
+    
+    while [ $attempt -le $max_attempts ]; do
+        if [ -d "$directory/.git" ] && git -C "$directory" rev-parse --git-dir >/dev/null 2>&1; then
+            echo "Repository exists, updating..."
+            cd "$directory"
+            if git fetch origin && git checkout "$branch" 2>/dev/null && git pull origin "$branch" 2>/dev/null; then
+                echo "Repository updated."
+                break
+            else
+                echo "Update failed, re-cloning..."
+                rm -rf "${directory:?}" 2>/dev/null || find "${directory:?}" -mindepth 1 -delete 2>/dev/null || true
+                git clone -b "$branch" "$clone_url" "$directory" && break
+            fi
         else
-            echo "Update failed, re-cloning..."
-            rm -rf "${directory:?}"
-            git clone -b "$branch" "$clone_url" "$directory"
+            if [ -d "$directory" ]; then
+                echo "Directory exists but is not a valid git repo, cleaning..."
+                rm -rf "${directory:?}" 2>/dev/null || find "${directory:?}" -mindepth 1 -delete 2>/dev/null || true
+            fi
+            echo "Cloning (attempt $attempt/$max_attempts)..."
+            if git clone -b "$branch" "$clone_url" "$directory"; then
+                break
+            fi
         fi
-    else
-        echo "Cloning..."
-        git clone -b "$branch" "$clone_url" "$directory"
-    fi
+        
+        if [ $attempt -lt $max_attempts ]; then
+            echo "Clone failed, retrying in ${delay}s..."
+            sleep $delay
+            attempt=$((attempt + 1))
+            delay=$((delay * 2))
+        else
+            echo "Clone failed after $max_attempts attempts."
+            return 1
+        fi
+    done
     
     if [ -d "$directory/.git" ]; then
         cd "$directory"
@@ -113,4 +184,4 @@ else
     echo "Repository sync completed."
 fi
 
-exec "$@"
+exec gosu aiuser "$@"

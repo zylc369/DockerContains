@@ -12,6 +12,10 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONTAINER_NAME="ai-container"
 
+PUID=$(id -u)
+PGID=$(id -g)
+export PUID PGID
+
 # Function to print colored messages
 info_msg() {
     echo -e "${BLUE}ℹ${NC} $1"
@@ -57,23 +61,6 @@ clean_appledouble() {
         info_msg "Cleaning $count AppleDouble file(s) (macOS metadata on external volume)..."
         find "$SCRIPT_DIR" -name "._*" -type f -delete 2>/dev/null
         success_msg "AppleDouble files cleaned"
-    fi
-}
-
-# Function to fix permissions on data directories (aiuser UID=1000, GID=1000)
-fix_data_permissions() {
-    local data_dir="$SCRIPT_DIR/data/home"
-    if [ -d "$data_dir" ]; then
-        info_msg "Fixing permissions on data directories..."
-        # Get current ownership
-        local current_owner=$(stat -f "%u:%g" "$data_dir" 2>/dev/null || stat -c "%u:%g" "$data_dir" 2>/dev/null)
-        if [ "$current_owner" != "1000:1000" ]; then
-            info_msg "Changing ownership of $data_dir to 1000:1000 (aiuser)..."
-            sudo chown -R 1000:1000 "$data_dir"
-            success_msg "Permissions fixed"
-        else
-            info_msg "Permissions already correct"
-        fi
     fi
 }
 
@@ -259,8 +246,6 @@ fi
 
 # Step 2: Handle container start/restart/rebuild
 info_msg "Checking container status..."
-
-fix_data_permissions
 
 if [ "$FORCE_REBUILD" = true ]; then
     info_msg "Stopping container..."

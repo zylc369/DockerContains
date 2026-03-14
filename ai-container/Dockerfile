@@ -16,7 +16,13 @@ RUN sed -i 's|ports.ubuntu.com|mirrors.aliyun.com|g' /etc/apt/sources.list && \
     vim \
     jq \
     software-properties-common \
+    gpg \
     && rm -rf /var/lib/apt/lists/*
+
+# Install gosu for privilege dropping
+RUN curl -fsSL https://github.com/tianon/gosu/releases/download/1.17/gosu-$(dpkg --print-architecture) -o /usr/local/bin/gosu && \
+    chmod +x /usr/local/bin/gosu && \
+    gosu nobody true
 
 # Install Python 3.14 from Deadsnakes PPA
 RUN add-apt-repository ppa:deadsnakes/ppa && \
@@ -54,9 +60,9 @@ RUN useradd -m -s /bin/bash aiuser && \
     echo "aiuser ALL=(ALL) ALL" >> /etc/sudoers
 
 # Copy opencode and bun from root to aiuser's home
-# Reason: Install scripts run as root, installing to /root/.opencode and /root/.bun
-# But the container runs as 'aiuser' (see USER aiuser below), who cannot access /root
-# So we copy these tools to /home/aiuser so aiuser can use them at runtime
+# Install scripts run as root, installing to /root/.opencode and /root/.bun
+# Container starts as root at runtime, entrypoint drops privileges via gosu
+# So we copy these tools to /home/aiuser for aiuser to use after privilege drop
 RUN mkdir -p /home/aiuser/.opencode && \
     mkdir -p /home/aiuser/.config/opencode && \
     mkdir -p /home/aiuser/Codes/ai-doctor/notes && \
@@ -91,10 +97,8 @@ COPY --chmod=755 lib/ /usr/local/lib/
 # Set PATH environment variable for runtime
 ENV PATH="/home/aiuser/.npm-global/bin:/home/aiuser/.opencode/bin:/home/aiuser/.bun/bin:$PATH"
 
-# Switch to non-root user
-USER aiuser
-
 # Use entrypoint to configure Git with GitHub Token
+# Container starts as root, entrypoint drops privileges via gosu
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Expose ports (4096 for opencode web, 4173 for serve)

@@ -44,7 +44,7 @@ if [ -n "$GITHUB_TOKEN" ]; then
     git config --global core.compression 0
     git config --global pack.windowMemory 512m
     git config --global pack.packSizeLimit 512m
-    echo "https://${GITHUB_TOKEN}@github.com" > ~/.git-credentials
+    echo "https://x-access-token:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
     chmod 600 ~/.git-credentials
     git config --global --add safe.directory '*' 2>/dev/null || true
     echo "Git configured successfully."

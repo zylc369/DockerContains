@@ -17,6 +17,7 @@ RUN sed -i 's|ports.ubuntu.com|mirrors.aliyun.com|g' /etc/apt/sources.list && \
     jq \
     software-properties-common \
     gpg \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Install gosu for privilege dropping

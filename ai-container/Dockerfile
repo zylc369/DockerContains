@@ -82,6 +82,7 @@ RUN chown -R aiuser:aiuser /home/aiuser
 
 # Copy entrypoint script
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chmod=755 lib/ /usr/local/lib/
 
 
 # Set PATH environment variable for runtime

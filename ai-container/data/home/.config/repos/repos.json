@@ -1,6 +1,19 @@
 {
   "repos": [
     {
+      "url": "https://github.com/zylc369/buwai-ai-extension",
+      "branch": "main",
+      "directory": "/home/aiuser/Codes/buwai-ai-extension",
+      "sparse_checkout": [
+        "/extensions/",
+        "/install-ai-extensions.sh",
+        "/init-ai-tools.sh",
+        "/uninstall-extensions.sh",
+        "/.gitignore"
+      ],
+      "post_clone": "./install-ai-extensions.sh"
+    },
+    {
       "url": "https://github.com/zylc369/buwai-claude-assistant",
       "branch": "main",
       "directory": "/home/aiuser/Codes/buwai-claude-assistant"

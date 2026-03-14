@@ -150,7 +150,7 @@ update_repository() {
             find "$target_dir" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} + 2>/dev/null || true
             git sparse-checkout init --no-cone
             printf '%s\n' "$sparse_content" | git sparse-checkout set --stdin
-            git checkout "$branch"
+            git checkout --force "$branch"
         fi
     fi
     

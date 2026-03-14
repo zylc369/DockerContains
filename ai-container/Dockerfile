@@ -36,7 +36,7 @@ RUN ln -sf /usr/bin/python3.14 /usr/bin/python3 && \
     curl -sS https://bootstrap.pypa.io/get-pip.py | python3
 
 # Install basedpyright globally
-# RUN python3.14 -m pip3 install --break-system-packages basedpyright==1.26.0 && python3.14 -m pip show basedpyright
+RUN python3.14 -m pip3 install --break-system-packages basedpyright==1.26.0 && python3.14 -m pip3 show basedpyright
 
 # Install Node.js (NodeSource) for serve package
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
@@ -44,7 +44,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
     rm -rf /var/lib/apt/lists/*
 
 # Install serve globally
-RUN npm install -g serve
+RUN npm install -g serve && npm install -g bash-language-server typescript-language-server
 
 
 # Install Bun

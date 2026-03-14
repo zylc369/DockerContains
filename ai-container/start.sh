@@ -75,11 +75,11 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --rebuild)
-            FORCE_REBUILD=true
+            FORCE_REBUILD_CACHE=true
             shift
             ;;
-        --rebuild-cache)
-            FORCE_REBUILD_CACHE=true
+        --rebuild-no-cache)
+            FORCE_REBUILD=true
             shift
             ;;
         -h|--help)
@@ -87,8 +87,8 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  -r, --restart      Restart the container if it's already running"
-            echo "  --rebuild          Stop, rebuild (no-cache), and start the container"
-            echo "  --rebuild-cache    Stop, rebuild (with cache), and start the container"
+            echo "  --rebuild          Stop, rebuild (with cache), and start the container"
+            echo "  --rebuild-no-cache Stop, rebuild (no-cache), and start the container"
             echo "  -h, --help         Show this help message"
             echo ""
             echo "This script will:"

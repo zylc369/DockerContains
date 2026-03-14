@@ -20,6 +20,10 @@ RUN sed -i 's|ports.ubuntu.com|mirrors.aliyun.com|g' /etc/apt/sources.list && \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Configure git globally (system-level, applies to all users)
+RUN git config --system user.email "buwai.bw@qq.com" && \
+    git config --system user.name "buwai"
+
 # Install gosu for privilege dropping
 RUN curl -fsSL https://github.com/tianon/gosu/releases/download/1.17/gosu-$(dpkg --print-architecture) -o /usr/local/bin/gosu && \
     chmod +x /usr/local/bin/gosu && \

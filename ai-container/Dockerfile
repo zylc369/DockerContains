@@ -24,11 +24,10 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     python3.14 \
     python3.14-venv \
     python3.14-dev \
-    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ln -sf /usr/bin/python3.14 /usr/bin/python3 && \
-    python3 -m pip install --upgrade pip --break-system-packages && \
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3 && \
     printf '#!/bin/sh\nexec python3 -m pip "$@"\n' > /usr/local/bin/pip3 && \
     chmod +x /usr/local/bin/pip3
 

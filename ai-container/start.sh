@@ -60,6 +60,23 @@ clean_appledouble() {
     fi
 }
 
+# Function to fix permissions on data directories (aiuser UID=1000, GID=1000)
+fix_data_permissions() {
+    local data_dir="$SCRIPT_DIR/data/home"
+    if [ -d "$data_dir" ]; then
+        info_msg "Fixing permissions on data directories..."
+        # Get current ownership
+        local current_owner=$(stat -f "%u:%g" "$data_dir" 2>/dev/null || stat -c "%u:%g" "$data_dir" 2>/dev/null)
+        if [ "$current_owner" != "1000:1000" ]; then
+            info_msg "Changing ownership of $data_dir to 1000:1000 (aiuser)..."
+            sudo chown -R 1000:1000 "$data_dir"
+            success_msg "Permissions fixed"
+        else
+            info_msg "Permissions already correct"
+        fi
+    fi
+}
+
 # Parse arguments
 FORCE_RESTART=false
 FORCE_REBUILD=false
@@ -236,6 +253,8 @@ fi
 
 # Step 2: Handle container start/restart/rebuild
 info_msg "Checking container status..."
+
+fix_data_permissions
 
 if [ "$FORCE_REBUILD" = true ]; then
     info_msg "Stopping container..."

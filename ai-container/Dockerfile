@@ -17,6 +17,14 @@ RUN sed -i 's|ports.ubuntu.com|mirrors.aliyun.com|g' /etc/apt/sources.list && \
     jq \
     software-properties-common \
     gpg \
+    wget \
+    sqlite3 \
+    ripgrep \
+    fd-find \
+    bat \
+    fzf \
+    net-tools \
+    iputils-ping \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 

@@ -184,4 +184,43 @@ else
     echo "Repository sync completed."
 fi
 
+# Setup buwai-claude-assistant dependencies
+BUWAI_DIR="/home/aiuser/Codes/buwai-claude-assistant"
+if [ -d "$BUWAI_DIR" ]; then
+    echo ""
+    echo "Setting up buwai-claude-assistant dependencies..."
+    
+    # Setup Python backend (server/.venv)
+    SERVER_DIR="$BUWAI_DIR/server"
+    if [ -d "$SERVER_DIR" ]; then
+        if [ ! -d "$SERVER_DIR/.venv" ]; then
+            echo "Creating Python virtual environment for server..."
+            cd "$SERVER_DIR"
+            python3 -m venv .venv
+            echo "Installing Python dependencies..."
+            .venv/bin/pip install --upgrade pip
+            if [ -f "requirements.txt" ]; then
+                .venv/bin/pip install -r requirements.txt
+            fi
+            echo "Python virtual environment setup completed."
+        else
+            echo "Python virtual environment already exists at server/.venv"
+        fi
+    fi
+    
+    # Setup frontend (web/ bun install)
+    WEB_DIR="$BUWAI_DIR/web"
+    if [ -d "$WEB_DIR" ]; then
+        echo "Installing frontend dependencies with bun..."
+        cd "$WEB_DIR"
+        /home/aiuser/.bun/bin/bun install
+        echo "Frontend dependencies installed."
+    fi
+    
+    # Fix ownership for newly created files
+    chown -R "$PUID:$PGID" "$BUWAI_DIR" 2>/dev/null || true
+    
+    echo "buwai-claude-assistant setup completed."
+fi
+
 exec gosu aiuser "$@"

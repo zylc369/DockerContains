@@ -15,10 +15,6 @@
 !/data/notes/.gitkeep
 
 !/data/home
-!/data/home/.cache
-!/data/home/.cache/opencode
-!/data/home/.cache/opencode/.gitkeep
-
 !/data/home/.config
 !/data/home/.config/opencode
 !/data/home/.config/opencode/.gitkeep

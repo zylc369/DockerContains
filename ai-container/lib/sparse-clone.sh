@@ -24,6 +24,8 @@
 
 set -e
 
+git config --global --add safe.directory '*' 2>/dev/null || true
+
 # Default values
 MAX_ATTEMPTS=5
 INITIAL_DELAY=5
@@ -81,7 +83,10 @@ clone_with_retry() {
     local delay=$INITIAL_DELAY
     
     while [ $attempt -le $MAX_ATTEMPTS ]; do
-        rm -rf "${target_dir:?}/"* "${target_dir:?}/".* 2>/dev/null || true
+        if [ -d "$target_dir" ]; then
+            rm -rf "${target_dir:?}" 2>/dev/null || find "${target_dir:?}" -mindepth 1 -delete 2>/dev/null || true
+        fi
+        mkdir -p "$(dirname "$target_dir")"
         
         log_info "Clone attempt $attempt/$MAX_ATTEMPTS..."
         

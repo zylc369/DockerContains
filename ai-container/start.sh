@@ -12,6 +12,10 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONTAINER_NAME="ai-container"
 
+PUID=$(id -u)
+PGID=$(id -g)
+export PUID PGID
+
 # Function to print colored messages
 info_msg() {
     echo -e "${BLUE}ℹ${NC} $1"
@@ -63,6 +67,7 @@ clean_appledouble() {
 # Parse arguments
 FORCE_RESTART=false
 FORCE_REBUILD=false
+FORCE_REBUILD_CACHE=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         -r|--restart)
@@ -70,6 +75,10 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --rebuild)
+            FORCE_REBUILD_CACHE=true
+            shift
+            ;;
+        --rebuild-no-cache)
             FORCE_REBUILD=true
             shift
             ;;
@@ -77,9 +86,10 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  -r, --restart    Restart the container if it's already running"
-            echo "  --rebuild        Stop, rebuild (no-cache), and start the container"
-            echo "  -h, --help       Show this help message"
+            echo "  -r, --restart      Restart the container if it's already running"
+            echo "  --rebuild          Stop, rebuild (with cache), and start the container"
+            echo "  --rebuild-no-cache Stop, rebuild (no-cache), and start the container"
+            echo "  -h, --help         Show this help message"
             echo ""
             echo "This script will:"
             echo "  1. Check for .env file and GITHUB_TOKEN"
@@ -245,6 +255,18 @@ if [ "$FORCE_REBUILD" = true ]; then
     
     info_msg "Rebuilding container (no-cache)..."
     docker-compose build --no-cache
+    
+    info_msg "Starting container..."
+    docker-compose up -d
+    success_msg "Container rebuilt and started successfully"
+elif [ "$FORCE_REBUILD_CACHE" = true ]; then
+    info_msg "Stopping container..."
+    docker-compose down
+    
+    clean_appledouble
+    
+    info_msg "Rebuilding container (with cache)..."
+    docker-compose build
     
     info_msg "Starting container..."
     docker-compose up -d

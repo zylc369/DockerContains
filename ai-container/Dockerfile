@@ -93,7 +93,7 @@ WORKDIR /home/aiuser
 
 # Install oh-my-opencode (with OpenCode Zen for free models)
 RUN cd /home/aiuser && \
-    /home/aiuser/.bun/bin/bunx oh-my-opencode install --no-tui --claude=no --openai=no --gemini=no --copilot=no --opencode-zen=yes
+    /home/aiuser/.bun/bin/bunx oh-my-opencode install --no-tui --claude=no --gemini=no --copilot=no --openai=no --opencode-zen=no --zai-coding-plan=yes
 
 # Restore opencode binary after oh-my-opencode install
 # Reason: oh-my-opencode may replace the opencode binary with a different version

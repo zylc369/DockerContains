@@ -27,7 +27,9 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ln -sf /usr/bin/python3.14 /usr/bin/python3 && \
-    curl -sS https://bootstrap.pypa.io/get-pip.py | python3
+    ln -sf /usr/bin/python3 /usr/bin/python && \
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3 && \
+    ln -sf /usr/bin/pip3 /usr/bin/pip
 
 # Install basedpyright globally
 # RUN python3.14 -m pip3 install --break-system-packages basedpyright==1.26.0

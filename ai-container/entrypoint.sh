@@ -184,6 +184,17 @@ else
     echo "Repository sync completed."
 fi
 
+SECRETARY_DIR="/home/aiuser/Codes/ai-secretary"
+if [ -d "$SECRETARY_DIR" ] && [ -f "$SECRETARY_DIR/bin/cli.sh" ]; then
+    echo ""
+    echo "Starting ai-secretary scheduler..."
+    mkdir -p /home/aiuser/.local/state/ai-secretary
+    cd "$SECRETARY_DIR"
+    nohup ./bin/cli.sh schedule > /home/aiuser/.local/state/ai-secretary/scheduler.log 2>&1 &
+    chown -R "$PUID:$PGID" /home/aiuser/.local/state/ai-secretary 2>/dev/null || true
+    echo "ai-secretary scheduler started (PID: $!)"
+fi
+
 # Setup buwai-claude-assistant dependencies
 BUWAI_DIR="/home/aiuser/Codes/buwai-claude-assistant"
 if [ -d "$BUWAI_DIR" ]; then

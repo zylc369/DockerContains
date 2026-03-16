@@ -38,7 +38,8 @@ RUN curl -fsSL https://github.com/tianon/gosu/releases/download/1.17/gosu-$(dpkg
     gosu nobody true
 
 # Install Python 3.14 from Deadsnakes PPA
-RUN add-apt-repository ppa:deadsnakes/ppa && \
+RUN curl --retry 5 --retry-delay 3 -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776" | gpg --dearmor -o /usr/share/keyrings/deadsnakes.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/deadsnakes.gpg] http://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main" > /etc/apt/sources.list.d/deadsnakes-ppa.list && \
     apt-get update && apt-get install -y \
     python3.14 \
     python3.14-venv \

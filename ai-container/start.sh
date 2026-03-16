@@ -14,7 +14,8 @@ CONTAINER_NAME="ai-container"
 
 PUID=$(id -u)
 PGID=$(id -g)
-export PUID PGID
+TZ=Asia/Shanghai
+export PUID PGID TZ
 
 # Function to print colored messages
 info_msg() {

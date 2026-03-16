@@ -11,6 +11,7 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
+      - TZ=${TZ:-Asia/Shanghai}
     ports:
       - "4097:4096"
     volumes:

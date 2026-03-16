@@ -190,7 +190,22 @@ if [ -d "$SECRETARY_DIR" ] && [ -f "$SECRETARY_DIR/bin/cli.sh" ]; then
     echo "Starting ai-secretary scheduler..."
     mkdir -p /home/aiuser/.local/state/ai-secretary
     cd "$SECRETARY_DIR"
-    nohup ./bin/cli.sh schedule > /home/aiuser/.local/state/ai-secretary/scheduler.log 2>&1 &
+    LOG_FILE="/home/aiuser/.local/state/ai-secretary/scheduler.log"
+    nohup bash -c '
+        retry=0
+        while [ $retry -lt 3 ]; do
+            ./bin/cli.sh schedule
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
+                break
+            fi
+            retry=$((retry + 1))
+            if [ $retry -lt 3 ]; then
+                echo "[$(date)] Scheduler exited with code $exit_code, retrying in 10s... (attempt $retry/3)"
+                sleep 10
+            fi
+        done
+    ' > "$LOG_FILE" 2>&1 &
     chown -R "$PUID:$PGID" /home/aiuser/.local/state/ai-secretary 2>/dev/null || true
     echo "ai-secretary scheduler started (PID: $!)"
 fi

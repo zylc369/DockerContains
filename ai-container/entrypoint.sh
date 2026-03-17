@@ -14,22 +14,7 @@ if [ "$PUID" != "$CURRENT_UID" ] || [ "$PGID" != "$CURRENT_GID" ]; then
     usermod -o -u "$PUID" aiuser 2>/dev/null || true
     
     chown -R "$PUID:$PGID" /home/aiuser
-    
-    for dir in \
-        /home/aiuser/Codes/ai-doctor/notes \
-        /home/aiuser/Codes/buwai-ai-extension \
-        /home/aiuser/Codes/buwai-claude-assistant \
-        /home/aiuser/.cache/opencode \
-        /home/aiuser/.config/opencode \
-        /home/aiuser/.config/repos \
-        /home/aiuser/.local/share/opencode \
-        /home/aiuser/.local/state/opencode
-    do
-        if [ -d "$dir" ]; then
-            chown -R "$PUID:$PGID" "$dir" 2>/dev/null || true
-        fi
-    done
-    
+
     echo "User configuration complete."
 fi
 

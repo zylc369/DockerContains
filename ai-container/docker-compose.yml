@@ -24,8 +24,8 @@ services:
     restart: on-failure:5
     command: >
       bash -c "
+      mkdir -p /home/aiuser/Codes/ai-doctor/notes &&
       cd /home/aiuser/Codes/ai-doctor &&
-      mkdir -p notes &&
       /home/aiuser/.opencode/bin/opencode web --hostname 0.0.0.0 --port 4096 --unmatched-request-proxy http://localhost:4173 &
       serve -s /home/aiuser/.opencode/web -l 4173
       "

@@ -15,9 +15,7 @@ services:
     ports:
       - "4097:4096"
     volumes:
-      - ./data/home/data/ai-doctor-notes:/home/aiuser/Codes/ai-doctor/notes
-      - ./data/home/Codes/buwai-ai-extension:/home/aiuser/Codes/buwai-ai-extension
-      - ./data/home/Codes/buwai-claude-assistant:/home/aiuser/Codes/buwai-claude-assistant
+      - ./data/home/Codes:/home/aiuser/Codes
       - ./data/home/.cache/opencode:/home/aiuser/.cache/opencode
       - ./data/home/.config/opencode:/home/aiuser/.config/opencode
       - ./data/home/.local/share/opencode:/home/aiuser/.local/share/opencode

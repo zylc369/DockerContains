@@ -33,6 +33,10 @@ if [ -n "$GITHUB_TOKEN" ]; then
     chmod 600 ~/.git-credentials
     git config --global --add safe.directory '*' 2>/dev/null || true
     echo "Git configured successfully."
+    
+    if command -v gh &> /dev/null; then
+        gh auth status 2>/dev/null && echo "GitHub CLI ready." || echo "GitHub CLI not authenticated (GH_TOKEN may be missing)."
+    fi
 else
     echo "Warning: GITHUB_TOKEN not set. Git operations may fail for private repos."
     git config --global http.lowSpeedLimit 0

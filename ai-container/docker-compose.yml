@@ -15,6 +15,7 @@ services:
       - TZ=${TZ:-Asia/Shanghai}
     ports:
       - "4097:4096"
+      - "4100:4100"
     volumes:
       - ./data/home/Codes:/home/aiuser/Codes
       - ./data/home/.cache/opencode:/home/aiuser/.cache/opencode

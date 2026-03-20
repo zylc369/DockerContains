@@ -117,6 +117,36 @@ basic_clone() {
     fi
 }
 
+start_background_service() {
+    local cmd="$1"
+    local log_file="$2"
+    local max_retries="${3:-3}"
+    local retry_interval="${4:-10}"
+    local service_name="${5:-Service}"
+    
+    mkdir -p "$(dirname "$log_file")"
+    
+    nohup bash -c "
+        retry=0
+        while [ \$retry -lt $max_retries ]; do
+            $cmd
+            exit_code=\$?
+            if [ \$exit_code -eq 0 ]; then
+                break
+            fi
+            retry=\$((retry + 1))
+            if [ \$retry -lt $max_retries ]; then
+                echo \"[\$(date)] $service_name exited with code \$exit_code, retrying in ${retry_interval}s... (attempt \$retry/$max_retries)\"
+                sleep $retry_interval
+            fi
+        done
+    " > "$log_file" 2>&1 &
+    
+    chown -R "$PUID:$PGID" "$(dirname "$log_file")" 2>/dev/null || true
+    
+    echo "$service_name started (PID: $!)"
+}
+
 if [ ! -f "$REPOS_CONFIG" ]; then
     echo ""
     echo "No repos.json config found at $REPOS_CONFIG"
@@ -177,26 +207,16 @@ SECRETARY_DIR="/home/aiuser/Codes/ai-secretary"
 if [ -d "$SECRETARY_DIR" ] && [ -f "$SECRETARY_DIR/bin/cli.sh" ]; then
     echo ""
     echo "Starting ai-secretary scheduler..."
-    mkdir -p /home/aiuser/.local/state/ai-secretary
-    cd "$SECRETARY_DIR"
-    LOG_FILE="/home/aiuser/.local/state/ai-secretary/scheduler.log"
-    nohup bash -c '
-        retry=0
-        while [ $retry -lt 3 ]; do
-            ./bin/cli.sh schedule
-            exit_code=$?
-            if [ $exit_code -eq 0 ]; then
-                break
-            fi
-            retry=$((retry + 1))
-            if [ $retry -lt 3 ]; then
-                echo "[$(date)] Scheduler exited with code $exit_code, retrying in 10s... (attempt $retry/3)"
-                sleep 10
-            fi
-        done
-    ' > "$LOG_FILE" 2>&1 &
-    chown -R "$PUID:$PGID" /home/aiuser/.local/state/ai-secretary 2>/dev/null || true
-    echo "ai-secretary scheduler started (PID: $!)"
+    start_background_service \
+        "/home/aiuser/Codes/ai-secretary/bin/cli.sh schedule" \
+        "/home/aiuser/.local/state/ai-secretary/scheduler.log" \
+        3 10 "ai-secretary scheduler"
+
+    echo "Starting ai-secretary manager web..."
+    start_background_service \
+        "/home/aiuser/Codes/ai-secretary/bin/web-dev.sh" \
+        "/home/aiuser/.local/state/ai-secretary/web.log" \
+        3 10 "ai-secretary manager web"
 fi
 
 # Setup buwai-claude-assistant dependencies

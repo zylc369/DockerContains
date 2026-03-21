@@ -208,15 +208,9 @@ if [ -d "$SECRETARY_DIR" ] && [ -f "$SECRETARY_DIR/bin/cli.sh" ]; then
     echo ""
     echo "Starting ai-secretary scheduler..."
     start_background_service \
-        "/home/aiuser/Codes/ai-secretary/bin/cli.sh schedule" \
+        "/home/aiuser/Codes/ai-secretary/bin/cli-schedule-web-dev.sh" \
         "/home/aiuser/.local/state/ai-secretary/scheduler.log" \
         3 10 "ai-secretary scheduler"
-
-    echo "Starting ai-secretary manager web..."
-    start_background_service \
-        "/home/aiuser/Codes/ai-secretary/bin/web-dev.sh" \
-        "/home/aiuser/.local/state/ai-secretary/web.log" \
-        3 10 "ai-secretary manager web"
 fi
 
 # Setup buwai-claude-assistant dependencies

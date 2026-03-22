@@ -29,6 +29,6 @@ services:
       bash -c "
       mkdir -p /home/aiuser/Codes/ai-doctor/notes &&
       cd /home/aiuser/Codes/ai-doctor &&
-      /home/aiuser/.opencode/bin/opencode web --hostname 0.0.0.0 --port 4096 --unmatched-request-proxy http://localhost:4173 &
+      OPENCODE_SERVER_USERNAME=${OPENCODE_SERVER_USERNAME} OPENCODE_SERVER_PASSWORD=${OPENCODE_SERVER_PASSWORD} /home/aiuser/.opencode/bin/opencode web --hostname 0.0.0.0 --port 4096 --unmatched-request-proxy http://localhost:4173 &
       serve -s /home/aiuser/.opencode/web -l 4173
       "

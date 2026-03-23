@@ -129,7 +129,7 @@ start_background_service() {
     
     mkdir -p "$(dirname "$log_file")"
     
-    nohup bash -c "
+    nohup gosu aiuser bash -c "
         retry=0
         while [ \$retry -lt $max_retries ]; do
             $cmd

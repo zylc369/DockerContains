@@ -17,7 +17,7 @@
       "url": "https://github.com/zylc369/ai-secretary",
       "branch": "main",
       "directory": "/home/aiuser/Codes/ai-secretary",
-      "post_clone": "mkdir -p /root/.ai-secretary && echo \"$GITHUB_TOKEN\" > /root/.ai-secretary/github-token"
+      "post_clone": "mkdir -p /home/aiuser/.ai-secretary && echo \"$GITHUB_TOKEN\" > /home/aiuser/.ai-secretary/github-token"
     },
     {
       "url": "https://github.com/zylc369/buwai-claude-assistant",

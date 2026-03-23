@@ -18,6 +18,9 @@ if [ "$PUID" != "$CURRENT_UID" ] || [ "$PGID" != "$CURRENT_GID" ]; then
     echo "User configuration complete."
 fi
 
+git config --global user.name buwai
+git config --global user.email buwai.bw@qq.com
+
 git config --global --add safe.directory '*' 2>/dev/null || true
 
 if [ -n "$GITHUB_TOKEN" ]; then

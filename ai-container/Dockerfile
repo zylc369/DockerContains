@@ -125,6 +125,7 @@ RUN echo '# Custom PATH for aiuser (bun, opencode, npm-global)' >> /home/aiuser/
 # Copy entrypoint script
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --chmod=755 lib/ /usr/local/lib/
+COPY --chmod=755 opencode-run.sh /usr/local/bin/opencode-run.sh
 
 
 # Set PATH environment variable for runtime

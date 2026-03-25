@@ -115,9 +115,18 @@ RUN printf '#!/bin/sh\nexec ls -ahl "$@"' > /usr/local/bin/ll && chmod +x /usr/l
 # Ensure proper ownership
 RUN chown -R aiuser:aiuser /home/aiuser
 
+# Add PATH to aiuser's .profile for login shells (gosu su - aiuser)
+# Note: .bashrc has early return for non-interactive shells, so we use .profile
+RUN echo '# Custom PATH for aiuser (bun, opencode, npm-global)' >> /home/aiuser/.profile && \
+    echo 'export PATH="/home/aiuser/.npm-global/bin:/home/aiuser/.opencode/bin:/home/aiuser/.bun/bin:$PATH"' >> /home/aiuser/.profile && \
+    # Fix bunx symlink (points to /root/.bun/bin/bun by default, aiuser can't access)
+    rm -f /home/aiuser/.bun/bin/bunx && \
+    ln -s /home/aiuser/.bun/bin/bun /home/aiuser/.bun/bin/bunx
+
 # Copy entrypoint script
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --chmod=755 lib/ /usr/local/lib/
+COPY --chmod=755 opencode-run.sh /usr/local/bin/opencode-run.sh
 
 
 # Set PATH environment variable for runtime

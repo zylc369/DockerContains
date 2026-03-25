@@ -130,6 +130,8 @@ start_background_service() {
     mkdir -p "$(dirname "$log_file")"
     
     nohup gosu aiuser bash -c "
+        # Ensure bun and other tools are in PATH when running via gosu
+        export PATH=\"/home/aiuser/.npm-global/bin:/home/aiuser/.opencode/bin:/home/aiuser/.bun/bin:\$PATH\"
         retry=0
         while [ \$retry -lt $max_retries ]; do
             $cmd
@@ -140,7 +142,7 @@ start_background_service() {
             retry=\$((retry + 1))
             if [ \$retry -lt $max_retries ]; then
                 echo \"[\$(date)] $service_name exited with code \$exit_code, retrying in ${retry_interval}s... (attempt \$retry/$max_retries)\"
-                sleep $retry_interval
+                sleep ${retry_interval}
             fi
         done
     " > "$log_file" 2>&1 &

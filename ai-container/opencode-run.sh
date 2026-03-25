@@ -6,4 +6,4 @@
 # Usage: opencode-run.sh [arguments...]
 # Example: opencode-run.sh 123
 
-exec OPENCODE_SERVER_USERNAME="${OPENCODE_SERVER_USERNAME}" OPENCODE_SERVER_PASSWORD="${OPENCODE_SERVER_PASSWORD}" /home/aiuser/.opencode/bin/opencode run "$@"
+exec env OPENCODE_SERVER_USERNAME="${OPENCODE_SERVER_USERNAME}" OPENCODE_SERVER_PASSWORD="${OPENCODE_SERVER_PASSWORD}" /home/aiuser/.opencode/bin/opencode run "$@"

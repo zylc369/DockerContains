@@ -108,7 +108,8 @@ RUN cd /home/aiuser && \
 # Restore opencode binary after oh-my-opencode install
 # Reason: oh-my-opencode may replace the opencode binary with a different version
 # We need to restore the original binary that supports --unmatched-request-proxy
-RUN cp /root/.opencode/bin/opencode /home/aiuser/.opencode/bin/opencode
+RUN cp /root/.opencode/bin/opencode /home/aiuser/.opencode/bin/opencode && \
+    rm -rf /root/.opencode
 # Configure ll command as global executable
 RUN printf '#!/bin/sh\nexec ls -ahl "$@"' > /usr/local/bin/ll && chmod +x /usr/local/bin/ll
 # Ensure proper ownership

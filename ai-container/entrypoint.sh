@@ -20,6 +20,7 @@ fi
 
 git config --global user.name buwai
 git config --global user.email buwai.bw@qq.com
+git config --global pull.rebase false
 
 git config --global --add safe.directory '*' 2>/dev/null || true
 
@@ -98,7 +99,7 @@ basic_clone() {
                 rm -rf "${directory:?}" 2>/dev/null || find "${directory:?}" -mindepth 1 -delete 2>/dev/null || true
             fi
             echo "Cloning (attempt $attempt/$max_attempts)..."
-            if git clone --depth 1 --single-branch -b "$branch" "$clone_url" "$directory"; then
+            if git clone -b "$branch" "$clone_url" "$directory"; then
                 break
             fi
         fi

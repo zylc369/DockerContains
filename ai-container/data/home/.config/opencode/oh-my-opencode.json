@@ -2,9 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "agents": {
     "sisyphus": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "ultrawork": {
-        "model": "zai-coding-plan/glm-5",
+        "model": "zai-coding-plan/glm-5.1",
         "variant": "max"
       }
     },
@@ -22,11 +22,11 @@
       "model": "zai-coding-plan/glm-4.6v"
     },
     "prometheus": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "variant": "max"
     },
     "metis": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "variant": "max"
     },
     "momus": {
@@ -43,11 +43,11 @@
   },
   "categories": {
     "visual-engineering": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "variant": "high"
     },
     "ultrabrain": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "variant": "xhigh"
     },
     "quick": {
@@ -57,18 +57,18 @@
       "model": "zai-coding-plan/glm-4.7"
     },
     "unspecified-high": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "variant": "high"
     },
     "writing": {
       "model": "zai-coding-plan/glm-4.7"
     },
     "deep": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "variant": "medium"
     },
     "artistry": {
-      "model": "zai-coding-plan/glm-5",
+      "model": "zai-coding-plan/glm-5.1",
       "variant": "high"
     }
   }

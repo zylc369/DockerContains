@@ -23,7 +23,7 @@ services:
       - ./data/home/.local/share/opencode:/home/aiuser/.local/share/opencode
       - ./data/home/.local/state/opencode:/home/aiuser/.local/state/opencode
       - ./data/home/.config/repos:/home/aiuser/.config/repos
-      - ./data/root/.ai-secretary:/root/.ai-secretary
+      - ./data/home/.ai-secretary:/home/aiuser/.ai-secretary
     restart: on-failure:5
     command: >
       bash -c "

@@ -18,6 +18,10 @@ if [ "$PUID" != "$CURRENT_UID" ] || [ "$PGID" != "$CURRENT_GID" ]; then
     echo "User configuration complete."
 fi
 
+git config --global user.name buwai
+git config --global user.email buwai.bw@qq.com
+git config --global pull.rebase false
+
 git config --global --add safe.directory '*' 2>/dev/null || true
 
 if [ -n "$GITHUB_TOKEN" ]; then
@@ -95,7 +99,7 @@ basic_clone() {
                 rm -rf "${directory:?}" 2>/dev/null || find "${directory:?}" -mindepth 1 -delete 2>/dev/null || true
             fi
             echo "Cloning (attempt $attempt/$max_attempts)..."
-            if git clone --depth 1 --single-branch -b "$branch" "$clone_url" "$directory"; then
+            if git clone -b "$branch" "$clone_url" "$directory"; then
                 break
             fi
         fi
@@ -126,7 +130,9 @@ start_background_service() {
     
     mkdir -p "$(dirname "$log_file")"
     
-    nohup bash -c "
+    nohup gosu aiuser bash -c "
+        # Ensure bun and other tools are in PATH when running via gosu
+        export PATH=\"/home/aiuser/.npm-global/bin:/home/aiuser/.opencode/bin:/home/aiuser/.bun/bin:\$PATH\"
         retry=0
         while [ \$retry -lt $max_retries ]; do
             $cmd
@@ -137,7 +143,7 @@ start_background_service() {
             retry=\$((retry + 1))
             if [ \$retry -lt $max_retries ]; then
                 echo \"[\$(date)] $service_name exited with code \$exit_code, retrying in ${retry_interval}s... (attempt \$retry/$max_retries)\"
-                sleep $retry_interval
+                sleep ${retry_interval}
             fi
         done
     " > "$log_file" 2>&1 &

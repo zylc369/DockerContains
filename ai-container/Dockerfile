@@ -77,7 +77,7 @@ RUN curl -fsSL https://bun.sh/install | bash
 
 # Install OpenCode (will be replaced later)
 # RUN curl -fsSL https://opencode.ai/install | bash
-RUN curl -fsSL https://raw.githubusercontent.com/zylc369/opencode/refs/heads/feature/optimization_v1_1/install-zylc369 | bash
+RUN curl -fsSL https://raw.githubusercontent.com/anomalyco/opencode/refs/heads/dev/install | bash
 
 # Create user 'aiuser' with sudo access
 RUN useradd -m -s /bin/bash aiuser && \

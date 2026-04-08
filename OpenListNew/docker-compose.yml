@@ -9,7 +9,7 @@ services:
       - '${OPLISTDX_TEMP}/aria2:/opt/openlist/data/temp/aria2'
       - '${OPLISTDX_TEMP}/qBittorrent:/opt/openlist/data/temp/qBittorrent'
       - '${OPLISTDX_TEMP}/Transmission:/opt/openlist/data/temp/Transmission'
-      - '/Volumes/ExtHD/HomeCloud:/opt/openlist/data/HomeCloud'
+      - '/Volumes/ExtHD/HomeCloud:/mnt/HomeCloud'
     user: '${OPLISTDX_PUID}:${OPLISTDX_PGID}' # If you are using v4.1.0 later, must uncomment this line and set the correct user ID and group ID.
     ports:
       - '5244:5244'

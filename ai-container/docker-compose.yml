@@ -24,7 +24,7 @@ services:
       - ./data/home/.local/state/opencode:/home/aiuser/.local/state/opencode
       - ./data/home/.config/repos:/home/aiuser/.config/repos
       - ./data/home/.ai-secretary:/home/aiuser/.ai-secretary
-    restart: on-failure:5
+    restart: "no"
     command: >
       bash -c "
       mkdir -p /home/aiuser/Codes/ai-doctor/notes &&

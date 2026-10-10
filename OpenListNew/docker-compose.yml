@@ -22,13 +22,13 @@ services:
       # - PGID=${OPLISTDX_PGID} # Deprecated in v4.1.0 later versions
       - TZ=${OPLISTDX_TZ}
       - UMASK=022
-    restart: unless-stopped
+    restart: "no"
 
   # Aria2 下载器及webui | Aria2 Downloader & WebUI
   aria2-pro:
     image: p3terx/aria2-pro
     container_name: aria2-pro-new
-    restart: unless-stopped
+    restart: "no"
     ports:
       - '6800:6800'
       - '6888:6888'
@@ -51,7 +51,7 @@ services:
     command: --port 6880
     ports:
       - 6880:6880
-    restart: unless-stopped
+    restart: "no"
     environment:
       - 'PUID=${OPLISTDX_PUID}'
       - 'PGID=${OPLISTDX_PGID}'
@@ -81,7 +81,7 @@ services:
       - 8080:8080
       - 6881:6881
       - 6881:6881/udp
-    restart: unless-stopped
+    restart: "no"
 
   # Transmission 下载器 | Transmission Downloader
   transmission:
@@ -106,4 +106,4 @@ services:
       - 9091:9091
       - 51413:51413
       - 51413:51413/udp
-    restart: unless-stopped
+    restart: "no"
